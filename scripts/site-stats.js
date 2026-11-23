@@ -90,6 +90,16 @@ function readSteamStats() {
   };
 }
 
+function readMusicStats() {
+  const data = readJson(path.join(hexo.source_dir, 'qq-music.json'), {});
+  return {
+    configured: Boolean(data.configured),
+    playlistName: data.playlistName || '我的歌单',
+    songCount: Number(data.songCount || 0),
+    tracks: Array.isArray(data.tracks) ? data.tracks : [],
+  };
+}
+
 function readPhotos() {
   const root = String(hexo.config.root || '/').replace(/\/?$/, '/');
   const metaList = readJson(path.join(hexo.source_dir, '_data', 'photos.json'), []);
@@ -165,6 +175,7 @@ hexo.extend.helper.register('site_stats', function () {
     githubAvatar: github.avatarUrl,
     heatmapDays: github.heatmapDays,
     steam: readSteamStats(),
+    music: readMusicStats(),
     photos: readPhotos(),
   };
 });

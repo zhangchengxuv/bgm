@@ -14,6 +14,7 @@
     "sync:covers": "node tools/sync-bangumi-covers.js",
     "sync:github": "node tools/sync-github-activity.js",
     "sync:steam": "node tools/sync-steam.js",
+    "sync:music": "node tools/sync-qqmusic.js",
     "sync:bangumi": "hexo bangumi -u && hexo books -u && hexo games -u",
     "publish:preview": "hexo bangumi -u && hexo books -u && hexo games -u && node tools/sync-bangumi-covers.js && hexo clean && hexo generate"
   },

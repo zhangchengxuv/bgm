@@ -59,6 +59,9 @@ jobs:
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
           STEAM_ID: ${{ secrets.STEAM_ID }}
 
+      - name: Sync QQ Music playlist
+        run: npm run sync:music
+
       - name: Build site
         run: npm run build
 

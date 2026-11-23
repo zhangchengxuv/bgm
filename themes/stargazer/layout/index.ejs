@@ -137,7 +137,100 @@
     </section>
   </div>
 
-  <!-- Row 3: Full-Width Photography Showcase -->
+  <!-- Row 3: QQ Music Vinyl Showcase -->
+  <%
+    const music = stats.music || {};
+    const musicTracks = music.tracks || [];
+    const leadTrack = musicTracks[0] || null;
+  %>
+  <% if (music.configured && musicTracks.length) { %>
+    <section class="bento-card bento-music reveal-3" id="music-card">
+      <div class="card-head">
+        <div class="music-head-left">
+          <h2 class="card-title">QQ 音乐 · <%= music.playlistName %></h2>
+          <span class="music-count mono"><%= music.songCount %> 首红心</span>
+        </div>
+        <% if (musicTracks.length > 6) { %>
+          <button type="button" class="music-shuffle-btn" id="music-shuffle-btn">换一批 ↻</button>
+        <% } %>
+      </div>
+
+      <div class="music-layout">
+        <div class="vinyl-showcase">
+          <div class="vinyl-disc" id="vinyl-disc">
+            <img id="vinyl-cover" src="<%= leadTrack.cover %>" alt="<%= leadTrack.name %>" referrerpolicy="no-referrer">
+            <span class="vinyl-hole" aria-hidden="true"></span>
+          </div>
+          <div class="vinyl-meta">
+            <span class="vinyl-tag">♫ RECENTLY LIKED</span>
+            <strong id="vinyl-title"><%= leadTrack.name %></strong>
+            <span id="vinyl-singer"><%= leadTrack.singer %></span>
+          </div>
+        </div>
+
+        <div class="music-track-grid" id="music-track-grid">
+          <% musicTracks.slice(0, 6).forEach((t, idx) => { %>
+            <a class="music-track-item" href="<%= t.url %>" target="_blank" rel="noopener" data-track-idx="<%= idx %>">
+              <img class="track-cover" src="<%= t.cover %>" alt="<%= t.name %>" loading="lazy" referrerpolicy="no-referrer">
+              <div class="track-info">
+                <h3><%= t.name %></h3>
+                <span><%= t.singer %></span>
+              </div>
+              <span class="track-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+
+      <script>
+        (() => {
+          const allTracks = <%- JSON.stringify(musicTracks) %>;
+          const grid = document.getElementById('music-track-grid');
+          const btn = document.getElementById('music-shuffle-btn');
+          const vCover = document.getElementById('vinyl-cover');
+          const vTitle = document.getElementById('vinyl-title');
+          const vSinger = document.getElementById('vinyl-singer');
+          let page = 0;
+
+          const setVinyl = t => {
+            if (!t) return;
+            vCover.src = t.cover;
+            vCover.alt = t.name;
+            vTitle.textContent = t.name;
+            vSinger.textContent = t.singer;
+          };
+
+          const bindHover = () => {
+            grid?.querySelectorAll('.music-track-item').forEach(el => {
+              el.addEventListener('mouseenter', () => {
+                setVinyl(allTracks[Number(el.dataset.trackIdx)]);
+              });
+            });
+          };
+          bindHover();
+
+          btn?.addEventListener('click', () => {
+            const pageSize = 6;
+            const totalPages = Math.ceil(allTracks.length / pageSize);
+            page = (page + 1) % totalPages;
+            const slice = allTracks.slice(page * pageSize, page * pageSize + pageSize);
+            grid.innerHTML = slice.map((t, i) => {
+              const idx = page * pageSize + i;
+              const esc = s => String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+              return `<a class="music-track-item" href="${esc(t.url)}" target="_blank" rel="noopener" data-track-idx="${idx}">` +
+                `<img class="track-cover" src="${esc(t.cover)}" alt="${esc(t.name)}" loading="lazy" referrerpolicy="no-referrer">` +
+                `<div class="track-info"><h3>${esc(t.name)}</h3><span>${esc(t.singer)}</span></div>` +
+                `<span class="track-eq" aria-hidden="true"><i></i><i></i><i></i></span></a>`;
+            }).join('');
+            setVinyl(slice[0]);
+            bindHover();
+          });
+        })();
+      </script>
+    </section>
+  <% } %>
+
+  <!-- Row 4: Full-Width Photography Showcase -->
   <section class="bento-card bento-gallery bento-gallery-wide reveal-4">
     <div class="card-head">
       <h2 class="card-title">摄影作品精选</h2>
