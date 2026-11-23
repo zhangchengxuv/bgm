@@ -117,19 +117,14 @@
         <a class="card-link" href="<%- url_for('/collection/') %>">全部 <%= stats.anime %> 部 →</a>
       </div>
 
-      <div class="anime-poster-list">
+      <div class="anime-poster-wall">
         <% stats.recentAnime.forEach(item => { %>
-          <a class="anime-mini-item" href="<%- url_for('/subject/' + item.id + '/') %>">
-            <div class="anime-cover-wrap">
-              <img class="anime-mini-cover" src="<%= item.cover %>" alt="<%= item.title %>" loading="lazy" referrerpolicy="no-referrer">
-            </div>
-            <div class="anime-mini-info">
-              <div class="anime-mini-top">
-                <span class="anime-status"><%= item.status %></span>
-                <span class="anime-score mono">★ <%= item.score %></span>
-              </div>
+          <a class="anime-poster-card" href="<%- url_for('/subject/' + item.id + '/') %>">
+            <img class="anime-poster-img" src="<%= item.cover %>" alt="<%= item.title %>" loading="lazy" referrerpolicy="no-referrer">
+            <span class="anime-poster-status"><%= item.status %></span>
+            <span class="anime-poster-score mono">★ <%= item.score %></span>
+            <div class="anime-poster-caption">
               <h3><%= item.title %></h3>
-              <span class="anime-sub"><%= item.type %></span>
             </div>
           </a>
         <% }) %>
