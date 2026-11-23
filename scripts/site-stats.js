@@ -67,7 +67,7 @@ function readGithubStats() {
       allDays.push({ date: day.date || '', count, level });
     });
   });
-  const heatmapDays = allDays.slice(-98);
+  const heatmapDays = allDays.slice(-140);
   return {
     totalContributions: Number(data.totalContributions || 0),
     username: data.username || 'zhangchengxuv',
@@ -84,7 +84,7 @@ hexo.extend.helper.register('site_stats', function () {
     books: countUnique('books.json'),
     games: countUnique('games.json'),
     posts: this.site?.posts?.length || 0,
-    recentAnime: getRecentAnime(3),
+    recentAnime: getRecentAnime(4),
     githubTotal: github.totalContributions,
     githubUsername: github.username,
     githubUrl: github.profileUrl,

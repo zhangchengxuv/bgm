@@ -65,8 +65,8 @@ body {
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
-.shell { width: min(1080px, calc(100% - 40px)); margin-inline: auto; }
-.bangumi-route .nav-wrap { width: min(1540px, calc(100% - 88px)); }
+.shell { width: min(1440px, calc(100% - 64px)); margin-inline: auto; }
+.bangumi-route .nav-wrap { width: min(1540px, calc(100% - 64px)); }
 .site-main { min-height: 76vh; position: relative; z-index: 1; }
 
 /* Twinkling Starfield + Drifting Aurora Background */
@@ -446,7 +446,7 @@ a.bento-card:hover {
 }
 .heatmap-grid {
   display: grid;
-  grid-template-columns: repeat(14, minmax(0, 1fr));
+  grid-template-columns: repeat(20, minmax(0, 1fr));
   gap: 5px;
 }
 .hm-cell {
@@ -550,22 +550,24 @@ a.bento-card:hover {
   gap: 16px;
 }
 .anime-poster-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 .anime-mini-item {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 10px;
-  margin-inline: -10px;
   border-radius: 16px;
-  transition: background .22s ease, transform .22s ease;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  transition: background .22s ease, transform .22s ease, border-color .22s ease;
 }
 .anime-mini-item:hover {
   background: var(--pill-active);
-  transform: translateX(4px);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
 }
 .anime-cover-wrap {
   width: 54px;
@@ -725,6 +727,8 @@ a.bento-card:hover {
   .main-nav a { padding: 6px 12px; font-size: 12px; }
   .bento-profile { padding: 24px; }
   .bento-posts, .bento-watching { padding: 22px 20px; }
+  .anime-poster-list { grid-template-columns: 1fr; }
+  .heatmap-grid { grid-template-columns: repeat(14, minmax(0, 1fr)); }
   .article-row { flex-direction: column; gap: 8px; }
   .article-aside { flex-direction: row; align-items: center; }
   .list-item { grid-template-columns: 1fr 36px; gap: 6px 14px; }
