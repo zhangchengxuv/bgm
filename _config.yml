@@ -9,8 +9,8 @@ author: 829882
 language: zh-CN
 timezone: Asia/Shanghai
 
-url: https://zhangchengxuv.github.io/bgm
-root: /bgm/
+url: https://zhangchenxu.uk
+root: /
 permalink: posts/:title/
 pretty_urls:
   trailing_index: false
