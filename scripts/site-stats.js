@@ -68,11 +68,13 @@ function readGithubStats() {
     });
   });
   const heatmapDays = allDays.slice(-140);
+  const root = String(hexo.config.root || '/').replace(/\/?$/, '/');
+  const localAvatar = fs.existsSync(path.join(hexo.source_dir, 'avatar.png')) ? `${root}avatar.png` : null;
   return {
     totalContributions: Number(data.totalContributions || 0),
     username: data.username || 'zhangchengxuv',
     profileUrl: data.profileUrl || 'https://github.com/zhangchengxuv',
-    avatarUrl: data.avatarUrl || 'https://github.com/zhangchengxuv.png',
+    avatarUrl: localAvatar || data.avatarUrl || 'https://github.com/zhangchengxuv.png',
     heatmapDays,
   };
 }
