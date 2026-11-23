@@ -675,6 +675,17 @@ a.bento-card:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.recent-badge {
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-3);
+  background: rgba(244, 114, 182, 0.16);
 }
 .steam-hours { font-size: 12px; color: var(--accent); flex: none; }
 .steam-bar-track {
@@ -694,6 +705,10 @@ a.bento-card:hover {
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   flex: 1;
+}
+.photo-preview-wide {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
 }
 .photo-preview-tile {
   position: relative;
@@ -981,6 +996,7 @@ a.bento-card:hover {
   .bento-profile { padding: 24px; }
   .bento-posts, .bento-watching { padding: 22px 20px; }
   .anime-poster-list { grid-template-columns: 1fr; }
+  .photo-preview-wide { grid-template-columns: repeat(2, 1fr); }
   .heatmap-grid { grid-template-columns: repeat(14, minmax(0, 1fr)); }
   .article-row { flex-direction: column; gap: 8px; }
   .article-aside { flex-direction: row; align-items: center; }

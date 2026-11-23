@@ -1,6 +1,16 @@
 <%
   const stats = site_stats();
-  const recentPosts = page.posts ? page.posts.toArray().slice(0, 5) : [];
+  const steam = stats.steam || {};
+  const recentIds = new Set((steam.recentGames || []).map(g => g.appid));
+  const mergedSteam = [];
+  const seenSteam = new Set();
+  [...(steam.recentGames || []), ...(steam.topGames || [])].forEach(g => {
+    if (!g || seenSteam.has(g.appid) || mergedSteam.length >= 6) return;
+    seenSteam.add(g.appid);
+    mergedSteam.push({ ...g, isRecent: recentIds.has(g.appid) });
+  });
+  const maxHours = Math.max(1, ...mergedSteam.map(g => Number(g.hoursForever || 0)));
+  const previewPhotos = (stats.photos || []).slice(0, 6);
 %>
 
 <section class="bento-home shell">
@@ -21,12 +31,12 @@
       </div>
 
       <p class="profile-bio">
-        穿梭于代码与二次元星海之间——这里记录我的技术笔记与云端折腾，也与 Bangumi、GitHub 每日自动同步我追过的番、读过的书与开源足迹。
+        穿梭于代码、游戏与二次元星海之间——这里记录我的摄影作品，并与 Bangumi、Steam、GitHub 每日自动同步追番书单、游玩时长与开源足迹。
       </p>
 
       <div class="profile-actions">
         <a class="btn btn-aurora" href="<%- url_for('/collection/') %>">探索收藏馆 ✦</a>
-        <a class="btn btn-glass" href="<%- url_for('/archives/') %>">阅读文章 →</a>
+        <a class="btn btn-glass" href="<%- url_for('/gallery/') %>">摄影画廊</a>
         <a class="btn btn-glass" href="<%= stats.githubUrl %>" target="_blank" rel="noopener">GitHub ↗</a>
         <a class="btn btn-glass" href="<%- url_for('/about/') %>">关于我</a>
       </div>
@@ -60,40 +70,51 @@
     </div>
   </div>
 
-  <!-- Row 2: Latest Posts + Recent Bangumi Posters -->
-  <div class="bento-grid bento-row-two">
-    <section class="bento-card bento-posts reveal-3">
+  <!-- Row 2: Steam Playtime (Top 6) + Recent Anime (6 Posters) -->
+  <div class="bento-grid bento-row-three">
+    <section class="bento-card bento-steam reveal-3">
       <div class="card-head">
-        <h2 class="card-title">最新文章</h2>
-        <a class="card-link" href="<%- url_for('/archives/') %>">全部 <%= stats.posts %> 篇 →</a>
+        <h2 class="card-title">Steam 游戏时长</h2>
+        <% if (steam.configured) { %>
+          <span class="card-meta mono"><%= steam.totalHours %>h · <%= steam.gameCount %> 款</span>
+        <% } else { %>
+          <span class="card-meta mono">隐私安全同步</span>
+        <% } %>
       </div>
 
-      <% if (recentPosts.length) { %>
-        <div class="article-list">
-          <% recentPosts.forEach(post => { %>
-            <a class="article-row" href="<%- url_for(post.path) %>">
-              <div class="article-main">
-                <h3><%= post.title %></h3>
-                <p><%= post.description || (post.excerpt ? strip_html(post.excerpt) : strip_html(post.content).slice(0, 76) + '…') %></p>
-              </div>
-              <div class="article-aside">
-                <time class="mono"><%= date(post.date, 'YYYY.MM.DD') %></time>
-                <% if (post.categories && post.categories.length) { %>
-                  <span class="cat-badge"><%= post.categories.toArray()[0].name %></span>
-                <% } %>
+      <% if (steam.configured && mergedSteam.length) { %>
+        <div class="steam-summary-bar">
+          <div class="steam-pill"><small>总时长</small><strong class="mono"><%= steam.totalHours %> h</strong></div>
+          <div class="steam-pill"><small>近两周</small><strong class="mono"><%= steam.recentHours %> h</strong></div>
+          <div class="steam-pill"><small>库内游戏</small><strong class="mono"><%= steam.gameCount %> 款</strong></div>
+        </div>
+        <div class="steam-game-list">
+          <% mergedSteam.forEach(game => { %>
+            <a class="steam-game-item" href="https://store.steampowered.com/app/<%= game.appid %>/" target="_blank" rel="noopener">
+              <img class="steam-cover" src="<%= game.headerUrl %>" alt="<%= game.name %>" loading="lazy" referrerpolicy="no-referrer">
+              <div class="steam-game-info">
+                <div class="steam-game-top">
+                  <h3><%= game.name %><% if (game.isRecent) { %><span class="recent-badge">近期</span><% } %></h3>
+                  <span class="steam-hours mono"><%= game.hoursForever %> h</span>
+                </div>
+                <div class="steam-bar-track">
+                  <div class="steam-bar-fill" style="width:<%= Math.min(100, Math.max(6, Math.round((game.hoursForever / maxHours) * 100))) %>%"></div>
+                </div>
               </div>
             </a>
           <% }) %>
         </div>
       <% } else { %>
-        <p class="muted-empty">暂无文章。</p>
+        <div class="bento-placeholder">
+          <p>在 GitHub Secrets 中配置 <code>STEAM_API_KEY</code> 与 <code>STEAM_ID</code> 后自动同步总时长与常玩游戏榜单（不暴露个人主页）。</p>
+        </div>
       <% } %>
     </section>
 
     <section class="bento-card bento-watching reveal-4">
       <div class="card-head">
         <h2 class="card-title">最近在看 / 看过</h2>
-        <a class="card-link" href="<%- url_for('/collection/') %>">全部收藏 →</a>
+        <a class="card-link" href="<%- url_for('/collection/') %>">全部 <%= stats.anime %> 部 →</a>
       </div>
 
       <div class="anime-poster-list">
@@ -116,74 +137,26 @@
     </section>
   </div>
 
-  <!-- Row 3: Steam Playtime (Privacy-Safe) + Photography Preview -->
-  <%
-    const steam = stats.steam || {};
-    const steamList = (steam.recentGames && steam.recentGames.length ? steam.recentGames : steam.topGames || []).slice(0, 4);
-    const maxHours = Math.max(1, ...steamList.map(g => Number(g.hoursForever || 0)));
-    const previewPhotos = (stats.photos || []).slice(0, 4);
-  %>
-  <div class="bento-grid bento-row-three">
-    <section class="bento-card bento-steam reveal-3">
-      <div class="card-head">
-        <h2 class="card-title">Steam 游戏时长</h2>
-        <% if (steam.configured) { %>
-          <span class="card-meta mono"><%= steam.totalHours %>h · <%= steam.gameCount %> 款</span>
-        <% } else { %>
-          <span class="card-meta mono">隐私安全同步</span>
-        <% } %>
+  <!-- Row 3: Full-Width Photography Showcase -->
+  <section class="bento-card bento-gallery bento-gallery-wide reveal-4">
+    <div class="card-head">
+      <h2 class="card-title">摄影作品精选</h2>
+      <a class="card-link" href="<%- url_for('/gallery/') %>">查看全部 <%= stats.photos.length %> 张作品 →</a>
+    </div>
+
+    <% if (previewPhotos.length) { %>
+      <div class="photo-preview-grid photo-preview-wide">
+        <% previewPhotos.forEach(photo => { %>
+          <a class="photo-preview-tile" href="<%- url_for('/gallery/') %>">
+            <img src="<%= photo.src %>" alt="<%= photo.title %>" loading="lazy">
+          </a>
+        <% }) %>
       </div>
-
-      <% if (steam.configured && steamList.length) { %>
-        <div class="steam-summary-bar">
-          <div class="steam-pill"><small>总时长</small><strong class="mono"><%= steam.totalHours %> h</strong></div>
-          <div class="steam-pill"><small>近两周</small><strong class="mono"><%= steam.recentHours %> h</strong></div>
-          <div class="steam-pill"><small>库内游戏</small><strong class="mono"><%= steam.gameCount %> 款</strong></div>
-        </div>
-        <div class="steam-game-list">
-          <% steamList.forEach(game => { %>
-            <a class="steam-game-item" href="https://store.steampowered.com/app/<%= game.appid %>/" target="_blank" rel="noopener">
-              <img class="steam-cover" src="<%= game.headerUrl %>" alt="<%= game.name %>" loading="lazy" referrerpolicy="no-referrer">
-              <div class="steam-game-info">
-                <div class="steam-game-top">
-                  <h3><%= game.name %></h3>
-                  <span class="steam-hours mono"><%= game.hoursForever %> h</span>
-                </div>
-                <div class="steam-bar-track">
-                  <div class="steam-bar-fill" style="width:<%= Math.min(100, Math.max(6, Math.round((game.hoursForever / maxHours) * 100))) %>%"></div>
-                </div>
-              </div>
-            </a>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <div class="bento-placeholder">
-          <p>在 GitHub 仓库 Secrets 中填入 <code>STEAM_API_KEY</code> 与 <code>STEAM_ID</code> 后，每日自动同步总游玩时长与常玩游戏榜单（仅展示游戏数据，不暴露个人 Steam 主页）。</p>
-        </div>
-      <% } %>
-    </section>
-
-    <section class="bento-card bento-gallery reveal-4">
-      <div class="card-head">
-        <h2 class="card-title">摄影作品</h2>
-        <a class="card-link" href="<%- url_for('/gallery/') %>">进入画廊 <%= stats.photos.length ? '(' + stats.photos.length + ')' : '' %> →</a>
-      </div>
-
-      <% if (previewPhotos.length) { %>
-        <div class="photo-preview-grid">
-          <% previewPhotos.forEach(photo => { %>
-            <a class="photo-preview-tile" href="<%- url_for('/gallery/') %>">
-              <img src="<%= photo.src %>" alt="<%= photo.title %>" loading="lazy">
-              <span class="photo-preview-label"><%= photo.title %></span>
-            </a>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <a class="bento-placeholder bento-placeholder-link" href="<%- url_for('/gallery/') %>">
-          <span class="placeholder-spark">✦</span>
-          <p>将摄影作品直接放入本地 <code>source/photos/</code> 文件夹并推送，首页与 <code>/gallery/</code> 画廊将自动展示高清网格与全屏灯箱。</p>
-        </a>
-      <% } %>
-    </section>
-  </div>
+    <% } else { %>
+      <a class="bento-placeholder bento-placeholder-link" href="<%- url_for('/gallery/') %>">
+        <span class="placeholder-spark">✦</span>
+        <p>将照片放入本地 <code>source/photos/</code> 并推送即可自动展示。</p>
+      </a>
+    <% } %>
+  </section>
 </section>
