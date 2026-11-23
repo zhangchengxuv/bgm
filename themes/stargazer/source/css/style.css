@@ -127,13 +127,10 @@ img { max-width: 100%; display: block; }
 
 /* Header with Floating Aurora Glass Pill Nav */
 .site-header {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
-  padding: 18px 0;
-  transition: padding .25s ease;
+  padding: 20px 0 12px;
 }
-.site-header.scrolled { padding: 12px 0; }
 .nav-wrap {
   display: flex;
   align-items: center;
