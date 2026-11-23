@@ -115,4 +115,75 @@
       </div>
     </section>
   </div>
+
+  <!-- Row 3: Steam Playtime (Privacy-Safe) + Photography Preview -->
+  <%
+    const steam = stats.steam || {};
+    const steamList = (steam.recentGames && steam.recentGames.length ? steam.recentGames : steam.topGames || []).slice(0, 4);
+    const maxHours = Math.max(1, ...steamList.map(g => Number(g.hoursForever || 0)));
+    const previewPhotos = (stats.photos || []).slice(0, 4);
+  %>
+  <div class="bento-grid bento-row-three">
+    <section class="bento-card bento-steam reveal-3">
+      <div class="card-head">
+        <h2 class="card-title">Steam 游戏时长</h2>
+        <% if (steam.configured) { %>
+          <span class="card-meta mono"><%= steam.totalHours %>h · <%= steam.gameCount %> 款</span>
+        <% } else { %>
+          <span class="card-meta mono">隐私安全同步</span>
+        <% } %>
+      </div>
+
+      <% if (steam.configured && steamList.length) { %>
+        <div class="steam-summary-bar">
+          <div class="steam-pill"><small>总时长</small><strong class="mono"><%= steam.totalHours %> h</strong></div>
+          <div class="steam-pill"><small>近两周</small><strong class="mono"><%= steam.recentHours %> h</strong></div>
+          <div class="steam-pill"><small>库内游戏</small><strong class="mono"><%= steam.gameCount %> 款</strong></div>
+        </div>
+        <div class="steam-game-list">
+          <% steamList.forEach(game => { %>
+            <a class="steam-game-item" href="https://store.steampowered.com/app/<%= game.appid %>/" target="_blank" rel="noopener">
+              <img class="steam-cover" src="<%= game.headerUrl %>" alt="<%= game.name %>" loading="lazy" referrerpolicy="no-referrer">
+              <div class="steam-game-info">
+                <div class="steam-game-top">
+                  <h3><%= game.name %></h3>
+                  <span class="steam-hours mono"><%= game.hoursForever %> h</span>
+                </div>
+                <div class="steam-bar-track">
+                  <div class="steam-bar-fill" style="width:<%= Math.min(100, Math.max(6, Math.round((game.hoursForever / maxHours) * 100))) %>%"></div>
+                </div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="bento-placeholder">
+          <p>在 GitHub 仓库 Secrets 中填入 <code>STEAM_API_KEY</code> 与 <code>STEAM_ID</code> 后，每日自动同步总游玩时长与常玩游戏榜单（仅展示游戏数据，不暴露个人 Steam 主页）。</p>
+        </div>
+      <% } %>
+    </section>
+
+    <section class="bento-card bento-gallery reveal-4">
+      <div class="card-head">
+        <h2 class="card-title">摄影作品</h2>
+        <a class="card-link" href="<%- url_for('/gallery/') %>">进入画廊 <%= stats.photos.length ? '(' + stats.photos.length + ')' : '' %> →</a>
+      </div>
+
+      <% if (previewPhotos.length) { %>
+        <div class="photo-preview-grid">
+          <% previewPhotos.forEach(photo => { %>
+            <a class="photo-preview-tile" href="<%- url_for('/gallery/') %>">
+              <img src="<%= photo.src %>" alt="<%= photo.title %>" loading="lazy">
+              <span class="photo-preview-label"><%= photo.title %></span>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <a class="bento-placeholder bento-placeholder-link" href="<%- url_for('/gallery/') %>">
+          <span class="placeholder-spark">✦</span>
+          <p>将摄影作品直接放入本地 <code>source/photos/</code> 文件夹并推送，首页与 <code>/gallery/</code> 画廊将自动展示高清网格与全屏灯箱。</p>
+        </a>
+      <% } %>
+    </section>
+  </div>
 </section>

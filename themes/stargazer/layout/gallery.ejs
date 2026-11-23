@@ -1,0 +1,129 @@
+<%
+  const stats = site_stats();
+  const photos = stats.photos || [];
+  const categories = [...new Set(photos.map(p => p.category).filter(Boolean))];
+%>
+
+<section class="gallery-page shell">
+  <div class="gallery-head">
+    <div>
+      <p class="eyebrow"><span></span> PHOTOGRAPHY GALLERY</p>
+      <h1>摄影作品画廊</h1>
+      <p class="gallery-lead">用镜头记录光影、旅途与日常片段。点击任意照片可全屏欣赏。</p>
+    </div>
+    <% if (categories.length > 1) { %>
+      <div class="gallery-filters" role="tablist" aria-label="摄影分类筛选">
+        <button type="button" class="filter-pill active" data-cat="all">全部 (<%= photos.length %>)</button>
+        <% categories.forEach(cat => { %>
+          <button type="button" class="filter-pill" data-cat="<%= cat %>"><%= cat %></button>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <% if (photos.length) { %>
+    <div class="gallery-grid" id="gallery-grid">
+      <% photos.forEach((photo, idx) => { %>
+        <figure class="bento-card photo-card" data-cat="<%= photo.category %>" data-index="<%= idx %>">
+          <button type="button" class="photo-trigger" aria-label="查看大图：<%= photo.title %>">
+            <img src="<%= photo.src %>" alt="<%= photo.title %>" loading="lazy">
+            <figcaption class="photo-caption">
+              <div class="photo-cap-top">
+                <strong><%= photo.title %></strong>
+                <span class="photo-cat"><%= photo.category %></span>
+              </div>
+              <% if (photo.location || photo.camera || photo.date) { %>
+                <div class="photo-cap-meta mono">
+                  <% if (photo.location) { %><span>📍 <%= photo.location %></span><% } %>
+                  <% if (photo.camera) { %><span>📷 <%= photo.camera %></span><% } %>
+                  <% if (photo.date) { %><span><%= photo.date %></span><% } %>
+                </div>
+              <% } %>
+            </figcaption>
+          </button>
+        </figure>
+      <% }) %>
+    </div>
+
+    <div class="lightbox" id="lightbox" hidden aria-modal="true" role="dialog">
+      <button type="button" class="lb-close" id="lb-close" aria-label="关闭">✕</button>
+      <button type="button" class="lb-nav lb-prev" id="lb-prev" aria-label="上一张">‹</button>
+      <div class="lb-stage">
+        <img id="lb-img" src="" alt="">
+        <div class="lb-info">
+          <strong id="lb-title"></strong>
+          <span id="lb-meta" class="mono"></span>
+        </div>
+      </div>
+      <button type="button" class="lb-nav lb-next" id="lb-next" aria-label="下一张">›</button>
+    </div>
+
+    <script>
+      (() => {
+        const photos = <%- JSON.stringify(photos) %>;
+        const cards = [...document.querySelectorAll('#gallery-grid .photo-card')];
+        const filters = [...document.querySelectorAll('.gallery-filters .filter-pill')];
+        const lb = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lb-img');
+        const lbTitle = document.getElementById('lb-title');
+        const lbMeta = document.getElementById('lb-meta');
+        let visibleIndices = photos.map((_, i) => i);
+        let currentPos = 0;
+
+        filters.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const cat = btn.dataset.cat;
+            filters.forEach(b => b.classList.toggle('active', b === btn));
+            visibleIndices = [];
+            cards.forEach(card => {
+              const show = cat === 'all' || card.dataset.cat === cat;
+              card.hidden = !show;
+              if (show) visibleIndices.push(Number(card.dataset.index));
+            });
+          });
+        });
+
+        const showAt = pos => {
+          if (!visibleIndices.length) return;
+          currentPos = (pos + visibleIndices.length) % visibleIndices.length;
+          const p = photos[visibleIndices[currentPos]];
+          lbImg.src = p.src;
+          lbImg.alt = p.title;
+          lbTitle.textContent = p.title;
+          lbMeta.textContent = [p.location, p.camera, p.date].filter(Boolean).join(' · ');
+        };
+
+        cards.forEach(card => {
+          card.querySelector('.photo-trigger')?.addEventListener('click', () => {
+            const idx = Number(card.dataset.index);
+            const pos = visibleIndices.indexOf(idx);
+            showAt(pos >= 0 ? pos : 0);
+            lb.hidden = false;
+            document.body.style.overflow = 'hidden';
+          });
+        });
+
+        const close = () => {
+          lb.hidden = true;
+          document.body.style.overflow = '';
+        };
+        document.getElementById('lb-close')?.addEventListener('click', close);
+        document.getElementById('lb-prev')?.addEventListener('click', () => showAt(currentPos - 1));
+        document.getElementById('lb-next')?.addEventListener('click', () => showAt(currentPos + 1));
+        lb?.addEventListener('click', e => { if (e.target === lb) close(); });
+        window.addEventListener('keydown', e => {
+          if (lb.hidden) return;
+          if (e.key === 'Escape') close();
+          if (e.key === 'ArrowLeft') showAt(currentPos - 1);
+          if (e.key === 'ArrowRight') showAt(currentPos + 1);
+        });
+      })();
+    </script>
+  <% } else { %>
+    <div class="bento-card gallery-empty">
+      <div class="empty-icon" aria-hidden="true">✦</div>
+      <h2>画廊已就绪，等待第一批光影作品</h2>
+      <p>直接把 <code>.jpg / .png / .webp</code> 照片放进本地 <code>source/photos/</code> 文件夹并推送到 GitHub，就会自动出现在这里（也可以在 <code>source/_data/photos.json</code> 中为每张图添加标题、地点和相机参数）。</p>
+    </div>
+  <% } %>
+</section>

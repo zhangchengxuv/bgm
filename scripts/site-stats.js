@@ -23,7 +23,7 @@ function countUnique(file) {
   return ids.size;
 }
 
-function getRecentAnime(limit = 3) {
+function getRecentAnime(limit = 4) {
   const data = readJson(path.join(hexo.source_dir, '_data', 'bangumis.json'), {});
   const manifest = readJson(path.join(hexo.source_dir, 'covers', 'manifest.json'), { covers: {} });
   const root = String(hexo.config.root || '/').replace(/\/?$/, '/');
@@ -77,6 +77,80 @@ function readGithubStats() {
   };
 }
 
+function readSteamStats() {
+  const data = readJson(path.join(hexo.source_dir, 'steam-games.json'), {});
+  return {
+    configured: Boolean(data.configured),
+    generatedAt: data.generatedAt || null,
+    gameCount: Number(data.gameCount || 0),
+    totalHours: Number(data.totalHours || 0),
+    recentHours: Number(data.recentHours || 0),
+    recentGames: Array.isArray(data.recentGames) ? data.recentGames : [],
+    topGames: Array.isArray(data.topGames) ? data.topGames : [],
+  };
+}
+
+function readPhotos() {
+  const root = String(hexo.config.root || '/').replace(/\/?$/, '/');
+  const metaList = readJson(path.join(hexo.source_dir, '_data', 'photos.json'), []);
+  const photosDir = path.join(hexo.source_dir, 'photos');
+  const imageExts = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif']);
+
+  const metaByFile = new Map();
+  const ordered = [];
+  const addedSrc = new Set();
+
+  const normalizeSrc = src => {
+    if (!src) return '';
+    if (/^https?:\/\//i.test(src)) return src;
+    const clean = String(src).replace(/^\/+/, '');
+    return clean.startsWith('photos/') ? `${root}${clean}` : `${root}photos/${clean}`;
+  };
+
+  if (Array.isArray(metaList)) {
+    metaList.forEach(item => {
+      if (!item?.src) return;
+      const src = normalizeSrc(item.src);
+      const fileKey = path.basename(String(item.src)).toLowerCase();
+      metaByFile.set(fileKey, item);
+      if (!addedSrc.has(src)) {
+        addedSrc.add(src);
+        ordered.push({
+          src,
+          title: item.title || path.parse(fileKey).name,
+          category: item.category || '摄影',
+          location: item.location || '',
+          camera: item.camera || '',
+          date: item.date || '',
+        });
+      }
+    });
+  }
+
+  if (fs.existsSync(photosDir)) {
+    const files = fs.readdirSync(photosDir)
+      .filter(name => imageExts.has(path.extname(name).toLowerCase()))
+      .sort((a, b) => b.localeCompare(a, 'zh-CN'));
+
+    files.forEach(file => {
+      if (metaByFile.has(file.toLowerCase())) return;
+      const src = `${root}photos/${encodeURIComponent(file)}`;
+      if (addedSrc.has(src)) return;
+      addedSrc.add(src);
+      ordered.push({
+        src,
+        title: path.parse(file).name.replace(/[-_]+/g, ' '),
+        category: '摄影',
+        location: '',
+        camera: '',
+        date: '',
+      });
+    });
+  }
+
+  return ordered;
+}
+
 hexo.extend.helper.register('site_stats', function () {
   const github = readGithubStats();
   return {
@@ -90,5 +164,7 @@ hexo.extend.helper.register('site_stats', function () {
     githubUrl: github.profileUrl,
     githubAvatar: github.avatarUrl,
     heatmapDays: github.heatmapDays,
+    steam: readSteamStats(),
+    photos: readPhotos(),
   };
 });
