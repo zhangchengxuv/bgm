@@ -111,14 +111,19 @@
       <% } %>
     </section>
 
-    <section class="bento-card bento-watching reveal-4">
+    <section class="bento-card bento-watching reveal-4" id="anime-wall-card">
       <div class="card-head">
         <h2 class="card-title">最近在看 / 看过</h2>
-        <a class="card-link" href="<%- url_for('/collection/') %>">全部 <%= stats.anime %> 部 →</a>
+        <div class="card-head-actions">
+          <% if (stats.recentAnime.length > 8) { %>
+            <button type="button" class="music-shuffle-btn" id="anime-rotate-btn">换一批 ↻</button>
+          <% } %>
+          <a class="card-link" href="<%- url_for('/collection/') %>">全部 <%= stats.anime %> 部 →</a>
+        </div>
       </div>
 
-      <div class="anime-poster-wall">
-        <% stats.recentAnime.forEach(item => { %>
+      <div class="anime-poster-wall" id="anime-poster-wall">
+        <% stats.recentAnime.slice(0, 8).forEach(item => { %>
           <a class="anime-poster-card" href="<%- url_for('/subject/' + item.id + '/') %>">
             <img class="anime-poster-img" src="<%= item.cover %>" alt="<%= item.title %>" loading="lazy" referrerpolicy="no-referrer">
             <span class="anime-poster-status"><%= item.status %></span>
@@ -129,6 +134,77 @@
           </a>
         <% }) %>
       </div>
+
+      <% if (stats.recentAnime.length > 8) { %>
+        <script>
+          (() => {
+            const pool = <%- JSON.stringify(stats.recentAnime) %>;
+            const subjectBase = <%- JSON.stringify(url_for('/subject/')) %>;
+            const wall = document.getElementById('anime-poster-wall');
+            const card = document.getElementById('anime-wall-card');
+            const btn = document.getElementById('anime-rotate-btn');
+            if (!wall || pool.length <= 8) return;
+
+            const pageSize = 8;
+            const totalPages = Math.ceil(pool.length / pageSize);
+            let page = 0;
+            let paused = false;
+            let timer = null;
+
+            const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+            const preloadPage = p => {
+              const start = (p % totalPages) * pageSize;
+              pool.slice(start, start + pageSize).forEach(item => {
+                if (!item?.cover) return;
+                const img = new Image();
+                img.referrerPolicy = 'no-referrer';
+                img.src = item.cover;
+              });
+            };
+
+            const renderPage = nextPage => {
+              page = (nextPage + totalPages) % totalPages;
+              const slice = pool.slice(page * pageSize, page * pageSize + pageSize);
+              const existing = [...wall.querySelectorAll('.anime-poster-card')];
+              existing.forEach((el, i) => {
+                el.style.transitionDelay = `${i * 35}ms`;
+                el.classList.add('is-swapping');
+              });
+
+              window.setTimeout(() => {
+                wall.innerHTML = slice.map((item, i) =>
+                  `<a class="anime-poster-card is-entering" style="--enter-delay:${i * 45}ms" href="${esc(subjectBase + item.id + '/')}">` +
+                  `<img class="anime-poster-img" src="${esc(item.cover)}" alt="${esc(item.title)}" referrerpolicy="no-referrer">` +
+                  `<span class="anime-poster-status">${esc(item.status)}</span>` +
+                  `<span class="anime-poster-score mono">★ ${esc(item.score)}</span>` +
+                  `<div class="anime-poster-caption"><h3>${esc(item.title)}</h3></div>` +
+                  `</a>`
+                ).join('');
+                preloadPage(page + 1);
+              }, 260);
+            };
+
+            const startTimer = () => {
+              window.clearInterval(timer);
+              if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+              timer = window.setInterval(() => {
+                if (!paused && !document.hidden) renderPage(page + 1);
+              }, 6000);
+            };
+
+            card?.addEventListener('mouseenter', () => { paused = true; });
+            card?.addEventListener('mouseleave', () => { paused = false; });
+            btn?.addEventListener('click', () => {
+              renderPage(page + 1);
+              startTimer();
+            });
+
+            preloadPage(1);
+            startTimer();
+          })();
+        </script>
+      <% } %>
     </section>
   </div>
 

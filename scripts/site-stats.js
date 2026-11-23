@@ -168,7 +168,7 @@ hexo.extend.helper.register('site_stats', function () {
     books: countUnique('books.json'),
     games: countUnique('games.json'),
     posts: this.site?.posts?.length || 0,
-    recentAnime: getRecentAnime(8),
+    recentAnime: getRecentAnime(32),
     githubTotal: github.totalContributions,
     githubUsername: github.username,
     githubUrl: github.profileUrl,
