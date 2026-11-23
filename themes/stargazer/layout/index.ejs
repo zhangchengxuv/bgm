@@ -1,14 +1,133 @@
-<section class="page-hero shell compact">
-  <p class="eyebrow"><span></span> LATEST NOTES</p>
-  <h1>放映手记</h1>
-  <p>一些关于故事、角色与心情的片段。</p>
+<%
+  const stats = site_stats();
+  const recentPosts = page.posts ? page.posts.toArray().slice(0, 6) : [];
+  const artClasses = ['art-1', 'art-2', 'art-3'];
+  const glyphs = ['✦', '◈', '◎', '✧', '◇', '○'];
+%>
+
+<section class="hero shell">
+  <div class="hero-copy">
+    <p class="eyebrow"><span></span> PERSONAL OBSERVATORY · ZHANGCHENXU.UK</p>
+    <h1>你好，欢迎来到<br><em><%= config.title %></em></h1>
+    <p class="hero-lead">
+      一座记录技术折腾、阅读思考、番剧书影音收藏与代码足迹的个人数字花园。所有收藏与 GitHub 活动每日自动同步，保持常新。
+    </p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="<%- url_for('/archives/') %>">
+        <span>阅读文章</span>
+        <span aria-hidden="true">→</span>
+      </a>
+      <a class="button button-ghost" href="<%- url_for('/collection/') %>">
+        <span>进入收藏馆</span>
+      </a>
+      <a class="button button-ghost" href="<%- url_for('/about/') %>">
+        <span>关于我</span>
+      </a>
+    </div>
+  </div>
+
+  <aside class="observatory-card" aria-label="站点实时观测数据">
+    <div class="obs-card-head">
+      <span class="obs-dot"></span>
+      <span>LIVE TELEMETRY · 1.048596</span>
+    </div>
+    <div class="obs-stats-grid">
+      <a class="obs-stat" href="<%- url_for('/collection/') %>">
+        <small>动画收藏</small>
+        <strong><%= stats.anime %></strong>
+        <span>部作品</span>
+      </a>
+      <a class="obs-stat" href="<%- url_for('/collection/#book') %>">
+        <small>书籍记录</small>
+        <strong><%= stats.books %></strong>
+        <span>本读物</span>
+      </a>
+      <a class="obs-stat" href="<%- url_for('/collection/#game') %>">
+        <small>游戏足迹</small>
+        <strong><%= stats.games %></strong>
+        <span>款游戏</span>
+      </a>
+      <a class="obs-stat accent" href="<%- url_for('/collection/#github') %>">
+        <small>GitHub 活动</small>
+        <strong><%= stats.githubTotal %></strong>
+        <span>次贡献</span>
+      </a>
+    </div>
+    <div class="obs-card-foot">
+      <span>每日 06:17 自动同步 Bangumi &amp; GitHub</span>
+      <a href="<%- url_for('/collection/') %>">查看详情 ↗</a>
+    </div>
+  </aside>
 </section>
-<section class="post-list shell">
-  <% page.posts.each(post => { %>
-    <article class="list-item">
-      <time><%= date(post.date, 'YYYY.MM.DD') %></time>
-      <div><h2><a href="<%- url_for(post.path) %>"><%= post.title %></a></h2><p><%= post.excerpt || strip_html(post.content).slice(0, 100) %></p></div>
-      <a class="list-arrow" href="<%- url_for(post.path) %>">↗</a>
-    </article>
-  <% }) %>
+
+<section class="now-showing shell">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow"><span></span> LATEST ARTICLES</p>
+      <h2>最新文章与手记</h2>
+    </div>
+    <a href="<%- url_for('/archives/') %>">查看全部 <%= stats.posts %> 篇文章 →</a>
+  </div>
+
+  <% if (recentPosts.length) { %>
+    <div class="post-grid">
+      <% recentPosts.forEach((post, idx) => { %>
+        <article class="post-card">
+          <a class="post-card-art <%= artClasses[idx % artClasses.length] %>" href="<%- url_for(post.path) %>">
+            <span class="card-number">NO.<%= String(idx + 1).padStart(2, '0') %></span>
+            <span class="card-glyph" aria-hidden="true"><%= glyphs[idx % glyphs.length] %></span>
+          </a>
+          <div class="post-meta">
+            <time><%= date(post.date, 'YYYY.MM.DD') %></time>
+            <% if (post.categories && post.categories.length) { %>
+              <span><%= post.categories.toArray()[0].name %></span>
+            <% } else { %>
+              <span>NOTE</span>
+            <% } %>
+          </div>
+          <h3><a href="<%- url_for(post.path) %>"><%= post.title %></a></h3>
+          <p><%= post.excerpt ? strip_html(post.excerpt) : strip_html(post.content).slice(0, 96) + '…' %></p>
+        </article>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-posts">
+      <p>还没有发布文章，在 <code>source/_posts/</code> 中添加 Markdown 文件即可自动展示。</p>
+    </div>
+  <% } %>
+</section>
+
+<section class="portal-section shell">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow"><span></span> EXPLORE</p>
+      <h2>站内探索</h2>
+    </div>
+  </div>
+  <div class="portal-grid">
+    <a class="portal-card" href="<%- url_for('/collection/') %>">
+      <span class="portal-tag">BANGUMI</span>
+      <h3>书影音收藏馆</h3>
+      <p>完整收录 <%= stats.anime %> 部动画、<%= stats.books %> 本书籍与 <%= stats.games %> 款游戏，支持拼音索引与详情页。</p>
+      <span class="portal-arrow">进入收藏馆 →</span>
+    </a>
+    <a class="portal-card" href="<%- url_for('/collection/#github') %>">
+      <span class="portal-tag">OPEN SOURCE</span>
+      <h3>GitHub 代码动态</h3>
+      <p>每日同步 @<%= stats.githubUsername %> 的公开提交记录与总贡献统计，追踪项目演进。</p>
+      <span class="portal-arrow">查看动态 →</span>
+    </a>
+    <a class="portal-card" href="<%- url_for('/archives/') %>">
+      <span class="portal-tag">ARCHIVE</span>
+      <h3>全部文章归档</h3>
+      <p>按时间线整理的技术笔记、折腾记录与观影随笔，沉淀每一次灵感与实践。</p>
+      <span class="portal-arrow">浏览归档 →</span>
+    </a>
+    <a class="portal-card" href="<%- url_for('/about/') %>">
+      <span class="portal-tag">ABOUT</span>
+      <h3>关于我与本站</h3>
+      <p>了解站点背后的技术栈、联系方式以及正在关注的方向与兴趣清单。</p>
+      <span class="portal-arrow">了解更多 →</span>
+    </a>
+  </div>
 </section>

@@ -1,6 +1,13 @@
+<%
+  const p = String(page.path || '');
+  const isHome = p === 'index.html' || p === '';
+  const isArchives = p.startsWith('archives/') || p.startsWith('posts/');
+  const isCollection = p.startsWith('collection/') || p.startsWith('subject/');
+  const isAbout = p.startsWith('about/');
+%>
 <header class="site-header">
   <div class="nav-wrap shell">
-    <a class="brand" href="<%- url_for('/') %>" aria-label="进入收藏页面">
+    <a class="brand" href="<%- url_for('/') %>" aria-label="返回首页">
       <svg class="brand-mark" viewBox="0 0 56 44" aria-hidden="true">
         <defs>
           <linearGradient id="worldline-gradient" x1="4" y1="36" x2="50" y2="8" gradientUnits="userSpaceOnUse">
@@ -20,5 +27,17 @@
         <small><i>1.048596</i> WORLD LINE</small>
       </span>
     </a>
+
+    <nav class="main-nav" aria-label="主导航">
+      <a href="<%- url_for('/') %>" class="<%= isHome ? 'active' : '' %>">首页</a>
+      <a href="<%- url_for('/archives/') %>" class="<%= isArchives ? 'active' : '' %>">文章</a>
+      <a href="<%- url_for('/collection/') %>" class="<%= isCollection ? 'active' : '' %>">收藏馆</a>
+      <a href="<%- url_for('/about/') %>" class="<%= isAbout ? 'active' : '' %>">关于</a>
+    </nav>
+
+    <button class="theme-toggle" type="button" aria-label="切换浅色/深色主题" title="切换主题">
+      <span class="sun" aria-hidden="true">☀</span>
+      <span class="moon" aria-hidden="true">☾</span>
+    </button>
   </div>
 </header>

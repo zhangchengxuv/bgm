@@ -3,7 +3,7 @@
 <% const isGame = item.media === 'game'; %>
 <% const progressCount = item.progressCount ?? item.ep_status ?? 0; %>
 <article class="subject-detail shell">
-  <a class="subject-back" href="<%- url_for('/') %>">← 返回收藏列表</a>
+  <a class="subject-back" href="<%- url_for('/collection/') %>">← 返回收藏列表</a>
   <div class="subject-card">
     <div class="subject-cover">
       <img src="<%- local_bangumi_cover(item, item.media || 'anime') %>" alt="<%= item.title %>" referrerpolicy="no-referrer">

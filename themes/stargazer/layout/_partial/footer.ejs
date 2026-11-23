@@ -1,7 +1,12 @@
 <footer class="site-footer shell">
   <div class="footer-line"></div>
   <div class="footer-content">
-    <p>© <%= theme.footer.since == new Date().getFullYear() ? theme.footer.since : theme.footer.since + '–' + new Date().getFullYear() %> <%= config.title %></p>
-    <p>故事未完，放映继续 <span aria-hidden="true">✦</span> Powered by Hexo & Bangumi</p>
+    <p>© <%= theme.footer.since == new Date().getFullYear() ? theme.footer.since : theme.footer.since + '–' + new Date().getFullYear() %> <%= config.title %> · zhangchenxu.uk</p>
+    <div class="footer-links">
+      <a href="<%- url_for('/archives/') %>">文章归档</a>
+      <a href="<%- url_for('/collection/') %>">书影音收藏</a>
+      <a href="https://github.com/zhangchengxuv" target="_blank" rel="noopener">GitHub</a>
+      <a href="<%= theme.social?.bangumi || 'https://bgm.tv/user/829882' %>" target="_blank" rel="noopener">Bangumi</a>
+    </div>
   </div>
 </footer>

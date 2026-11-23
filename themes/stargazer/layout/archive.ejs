@@ -1,14 +1,21 @@
 <section class="page-hero shell compact">
-  <p class="eyebrow"><span></span> SCREENING ARCHIVE</p>
-  <h1>放映手记</h1>
-  <p>按时间收藏的观看痕迹。</p>
+  <p class="eyebrow"><span></span> WRITING ARCHIVE</p>
+  <h1>文章归档</h1>
+  <p>按时间线收藏的技术笔记、随笔思考与折腾记录。</p>
 </section>
 <section class="post-list shell">
-  <% page.posts.each(post => { %>
-    <article class="list-item">
-      <time><%= date(post.date, 'YYYY.MM.DD') %></time>
-      <div><h2><a href="<%- url_for(post.path) %>"><%= post.title %></a></h2><p><%= post.excerpt || strip_html(post.content).slice(0, 100) %></p></div>
-      <a class="list-arrow" href="<%- url_for(post.path) %>">↗</a>
-    </article>
-  <% }) %>
+  <% if (page.posts && page.posts.length) { %>
+    <% page.posts.each(post => { %>
+      <article class="list-item">
+        <time><%= date(post.date, 'YYYY.MM.DD') %></time>
+        <div>
+          <h2><a href="<%- url_for(post.path) %>"><%= post.title %></a></h2>
+          <p><%= post.excerpt ? strip_html(post.excerpt) : strip_html(post.content).slice(0, 110) %></p>
+        </div>
+        <a class="list-arrow" href="<%- url_for(post.path) %>" aria-label="阅读全文">↗</a>
+      </article>
+    <% }) %>
+  <% } else { %>
+    <p class="collection-empty">暂无文章。</p>
+  <% } %>
 </section>

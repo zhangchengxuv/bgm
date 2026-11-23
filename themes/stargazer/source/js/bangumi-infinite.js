@@ -339,8 +339,9 @@
     let githubData = null;
     try {
       const syncVersion = Date.now().toString();
+      const siteRoot = new URL(page.dataset.root || '/', window.location.origin);
       const latestDataUrl = file => {
-        const url = new URL(file, window.location.href);
+        const url = new URL(file, siteRoot);
         url.searchParams.set('sync', syncVersion);
         return url;
       };
@@ -396,6 +397,11 @@
     page.appendChild(sentinel);
 
     activate(animePanel);
+
+    const initialHash = window.location.hash.replace(/^#/, '');
+    if (['book', 'game', 'github'].includes(initialHash)) {
+      page.querySelector(`.collection-switch button[data-media="${initialHash}"]`)?.click();
+    }
 
     new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting)) loadNextBatch();

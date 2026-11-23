@@ -1,11 +1,13 @@
 title: 世界线观测站
-subtitle: 记录每一次世界线变动
-description: 一座记录动画、短评与世界线变动的观测站
+subtitle: 记录技术、阅读、追番与每一次世界线变动
+description: 张晨旭的个人综合博客 — 记录技术笔记、随笔思考、动画书影音收藏与开源动态
 keywords:
+  - 个人博客
+  - 技术笔记
   - 动画
   - Bangumi
   - 追番记录
-author: 829882
+author: Zhang Chenxu
 language: zh-CN
 timezone: Asia/Shanghai
 
@@ -61,7 +63,7 @@ bangumi:
   enable: true
   source: bgmv0
   bgmInfoSource: bgmv0
-  path: index.html
+  path: collection/index.html
   vmid: 829882
   title: 我的追番地图
   quote: '<span class="bangumi-quote-mark">✦</span> 在故事宇宙里，认真记录每一次相遇。'
