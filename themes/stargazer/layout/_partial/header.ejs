@@ -8,19 +8,23 @@
 <header class="site-header">
   <div class="nav-wrap shell">
     <a class="brand" href="<%- url_for('/') %>" aria-label="返回首页">
-      <svg class="brand-mark" viewBox="0 0 56 44" aria-hidden="true">
+      <svg class="brand-mark" viewBox="0 0 44 44" aria-hidden="true">
         <defs>
-          <linearGradient id="worldline-gradient" x1="4" y1="36" x2="50" y2="8" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#60a5fa"/>
-            <stop offset="1" stop-color="#c4b5fd"/>
+          <linearGradient id="aurora-logo" x1="4" y1="40" x2="40" y2="4" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="52%" stop-color="#a78bfa"/>
+            <stop offset="100%" stop-color="#f472b6"/>
           </linearGradient>
         </defs>
-        <path class="brand-mark-ring" d="M40.8 7.8A18.2 18.2 0 1 0 45.9 33"/>
-        <path class="brand-mark-line" d="M3.5 31.5C13.2 23.1 25.7 16.8 52.4 12.2"/>
-        <path class="brand-mark-line brand-mark-line-alt" d="M6.2 10.5c11.1 2.3 22.1 10 43.6 25.3"/>
-        <circle class="brand-mark-core" cx="28" cy="22" r="3.2"/>
+        <ellipse class="brand-orbit" cx="22" cy="22" rx="18" ry="8.5" transform="rotate(-26 22 22)"/>
+        <path class="brand-star" d="M22 6 L24.9 19.1 L38 22 L24.9 24.9 L22 38 L19.1 24.9 L6 22 L19.1 19.1 Z"/>
+        <circle class="brand-spark-a" cx="35.5" cy="11.5" r="2.1"/>
+        <circle class="brand-spark-b" cx="10" cy="33" r="1.4"/>
       </svg>
-      <span class="brand-name"><%= config.title %></span>
+      <span class="brand-copy">
+        <span class="brand-name"><%= config.title %></span>
+        <span class="brand-tag mono">1.048596</span>
+      </span>
     </a>
 
     <nav class="main-nav" aria-label="主导航">

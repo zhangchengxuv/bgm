@@ -6,47 +6,49 @@
 <section class="bento-home shell">
   <!-- Row 1: Profile + Stats/Heatmap -->
   <div class="bento-grid">
-    <article class="bento-card bento-profile">
+    <article class="bento-card bento-profile reveal-1">
       <div class="profile-top">
-        <img class="profile-avatar" src="<%= stats.githubAvatar %>" alt="Zhang Chenxu" referrerpolicy="no-referrer" width="56" height="56">
+        <div class="avatar-ring">
+          <img class="profile-avatar" src="<%= stats.githubAvatar %>" alt="Zhang Chenxu" referrerpolicy="no-referrer" width="60" height="60">
+        </div>
         <div class="profile-id">
           <div class="status-pill">
             <span class="status-dot"></span>
-            <span>zhangchenxu.uk · 1.048596</span>
+            <span>zhangchenxu.uk · ✦ 星海观测中</span>
           </div>
-          <h1>Hi，我是 Zhang Chenxu</h1>
+          <h1>你好，我是 <span class="aurora-text">Zhang Chenxu</span></h1>
         </div>
       </div>
 
       <p class="profile-bio">
-        这里是我的个人空间——记录写代码与折腾云端网络的笔记，也和 Bangumi、GitHub 每日自动同步我追过的番、读过的书与写下的提交。
+        穿梭于代码与二次元星海之间——这里记录我的技术笔记与云端折腾，也与 Bangumi、GitHub 每日自动同步我追过的番、读过的书与开源足迹。
       </p>
 
       <div class="profile-actions">
-        <a class="btn btn-solid" href="<%- url_for('/archives/') %>">阅读文章 →</a>
-        <a class="btn btn-glass" href="<%- url_for('/collection/') %>">书影音收藏</a>
+        <a class="btn btn-aurora" href="<%- url_for('/collection/') %>">探索收藏馆 ✦</a>
+        <a class="btn btn-glass" href="<%- url_for('/archives/') %>">阅读文章 →</a>
         <a class="btn btn-glass" href="<%= stats.githubUrl %>" target="_blank" rel="noopener">GitHub ↗</a>
         <a class="btn btn-glass" href="<%- url_for('/about/') %>">关于我</a>
       </div>
     </article>
 
-    <div class="bento-side-col">
+    <div class="bento-side-col reveal-2">
       <div class="bento-mini-row">
         <a class="bento-card bento-stat" href="<%- url_for('/collection/') %>">
           <span class="stat-label">动画收藏</span>
-          <strong class="stat-num"><%= stats.anime %></strong>
-          <span class="stat-sub">Bangumi 同步</span>
+          <strong class="stat-num aurora-num-a"><%= stats.anime %></strong>
+          <span class="stat-sub">Bangumi 每日同步</span>
         </a>
         <a class="bento-card bento-stat" href="<%- url_for('/collection/#book') %>">
           <span class="stat-label">书籍 &amp; 游戏</span>
-          <strong class="stat-num"><%= stats.books + stats.games %></strong>
+          <strong class="stat-num aurora-num-b"><%= stats.books + stats.games %></strong>
           <span class="stat-sub"><%= stats.books %> 本书 · <%= stats.games %> 款游戏</span>
         </a>
       </div>
 
       <a class="bento-card bento-heatmap" href="<%- url_for('/collection/#github') %>">
         <div class="card-head">
-          <span class="card-title">GitHub 活跃</span>
+          <span class="card-title">GitHub 开源星图</span>
           <span class="card-meta mono"><%= stats.githubTotal %> 次贡献</span>
         </div>
         <div class="heatmap-grid" aria-label="GitHub 近期贡献热力图">
@@ -60,7 +62,7 @@
 
   <!-- Row 2: Latest Posts + Recent Bangumi Posters -->
   <div class="bento-grid bento-row-two">
-    <section class="bento-card bento-posts">
+    <section class="bento-card bento-posts reveal-3">
       <div class="card-head">
         <h2 class="card-title">最新文章</h2>
         <a class="card-link" href="<%- url_for('/archives/') %>">全部 <%= stats.posts %> 篇 →</a>
@@ -88,7 +90,7 @@
       <% } %>
     </section>
 
-    <section class="bento-card bento-watching">
+    <section class="bento-card bento-watching reveal-4">
       <div class="card-head">
         <h2 class="card-title">最近在看 / 看过</h2>
         <a class="card-link" href="<%- url_for('/collection/') %>">全部收藏 →</a>
@@ -97,7 +99,9 @@
       <div class="anime-poster-list">
         <% stats.recentAnime.forEach(item => { %>
           <a class="anime-mini-item" href="<%- url_for('/subject/' + item.id + '/') %>">
-            <img class="anime-mini-cover" src="<%= item.cover %>" alt="<%= item.title %>" loading="lazy" referrerpolicy="no-referrer">
+            <div class="anime-cover-wrap">
+              <img class="anime-mini-cover" src="<%= item.cover %>" alt="<%= item.title %>" loading="lazy" referrerpolicy="no-referrer">
+            </div>
             <div class="anime-mini-info">
               <div class="anime-mini-top">
                 <span class="anime-status"><%= item.status %></span>
